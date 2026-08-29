@@ -2,7 +2,7 @@ import time
 
 import unittest
 
-from credal_harness import CapabilityAuthority, CapabilityToken, CredalSet, Evidence, Harness, Hypothesis, RollbackSandbox, ToolCall, state_digest
+from credal_harness import AdaptiveCredalCalibrator, BudgetedAdaptiveCredalRouter, CalibrationSample, CapabilityAuthority, CapabilityToken, CredalSet, Evidence, Harness, Hypothesis, RiskControlledSelector, RollbackSandbox, ToolCall, state_digest
 from experiments.run_agent_harness import execute_episode, SCENARIOS
 from experiments.run_extended_studies import score, coverage_loss_seed
 
@@ -235,6 +235,43 @@ class CredalHarnessTests(unittest.TestCase):
     reactive = coverage_loss_seed(0, omitted_rate=0.10, probe_rate=0.0)
     probed = coverage_loss_seed(0, omitted_rate=0.10, probe_rate=0.20)
     self.assertLess(probed["harm_per_proposal"], reactive["harm_per_proposal"])
+
+  def test_adaptive_credal_radius_tracks_local_harm(self):
+    samples = []
+    for index in range(256):
+      x = index / 255
+      samples.append(CalibrationSample((x,), 0.01, int(x > 0.75), "write"))
+    model = AdaptiveCredalCalibrator(
+      samples, candidate_ks=(16, 32, 64), alpha=0.05, lipschitz=0.05
+    )
+    low = model.certificate((0.10,), 0.01, group="write")
+    high = model.certificate((0.90,), 0.01, group="write")
+    self.assertLess(low.upper_risk, high.upper_risk)
+    self.assertLess(low.epsilon, high.epsilon)
+
+  def test_budgeted_adaptive_router_never_overspends(self):
+    samples = [CalibrationSample((float(i),), 0.0, 0) for i in range(128)]
+    model = AdaptiveCredalCalibrator(
+      samples, candidate_ks=(128,), alpha=0.50, lipschitz=0.0
+    )
+    router = BudgetedAdaptiveCredalRouter(
+      model, automatic_threshold=0.10, sequence_budget=0.10
+    )
+    decisions = [router.decide((0.0,), 0.0) for _ in range(10)]
+    self.assertLessEqual(router.spent_budget, 0.10 + 1e-12)
+    self.assertTrue(any(row.action != "allow" for row in decisions))
+
+  def test_risk_controlled_selector_uses_independent_outcomes(self):
+    scores = [i / 1000 for i in range(1000)]
+    outcomes = [0] * 900 + [1] * 100
+    selector = RiskControlledSelector(
+      target_risk=0.10, alpha=0.05, candidate_thresholds=(0.25, 0.50, 0.75, 1.0)
+    )
+    certificate = selector.fit(scores, outcomes)
+    self.assertGreaterEqual(certificate.selected, 500)
+    self.assertLessEqual(certificate.upper_risk, 0.10)
+    self.assertTrue(selector.allows(0.10))
+    self.assertFalse(selector.allows(0.99))
 
 
 if __name__ == "__main__":

@@ -4,6 +4,9 @@ __pycache__/
 .DS_Store
 experiments/cache/
 experiments/results/
+!experiments/results/
+experiments/results/*
+!experiments/results/adaptive_benchmark.json
 external/
 output/
 tmp/

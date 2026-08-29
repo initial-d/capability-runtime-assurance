@@ -1,4 +1,4 @@
-.PHONY: test reproduce extensions sqlite sensitivity offline replay all
+.PHONY: test reproduce extensions adaptive sqlite sensitivity offline replay all
 
 PYTHON ?= python3
 
@@ -10,6 +10,9 @@ reproduce:
 
 extensions:
 	$(PYTHON) -m experiments.run_extended_studies
+
+adaptive:
+	$(PYTHON) -m experiments.run_adaptive_benchmark
 
 sqlite:
 	$(PYTHON) -m experiments.run_sqlite_transaction_benchmark
@@ -23,4 +26,4 @@ offline:
 replay: offline
 	$(PYTHON) -m experiments.run_policy_benchmark --traces experiments/results/agent_harness_results.json
 
-all: test reproduce extensions sqlite sensitivity offline replay
+all: test reproduce extensions adaptive sqlite sensitivity offline replay

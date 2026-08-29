@@ -13,6 +13,15 @@ from .core import (
     state_digest,
 )
 from .agent import ChatAPIConfig, HostedChatClient, ToolProposalAgent
+from .adaptive import (
+    AdaptiveCredalCalibrator,
+    BudgetedAdaptiveCredalRouter,
+    BudgetedRoutingDecision,
+    CalibrationSample,
+    LocalCredalCertificate,
+    RiskControlledSelector,
+    SelectiveRiskCertificate,
+)
 
 __all__ = [
     "ActionDecision",
@@ -28,4 +37,11 @@ __all__ = [
     "ChatAPIConfig",
     "HostedChatClient",
     "ToolProposalAgent",
+    "AdaptiveCredalCalibrator",
+    "BudgetedAdaptiveCredalRouter",
+    "BudgetedRoutingDecision",
+    "CalibrationSample",
+    "LocalCredalCertificate",
+    "RiskControlledSelector",
+    "SelectiveRiskCertificate",
 ]
