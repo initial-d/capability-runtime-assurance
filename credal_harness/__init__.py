@@ -22,6 +22,13 @@ from .adaptive import (
     RiskControlledSelector,
     SelectiveRiskCertificate,
 )
+from .partial_identification import (
+    PartialFeedbackCounts,
+    PartialFeedbackCredalCalibrator,
+    PartialFeedbackCredalRouter,
+    PartialFeedbackRoutingDecision,
+    PartialIdentificationCertificate,
+)
 
 __all__ = [
     "ActionDecision",
@@ -44,4 +51,9 @@ __all__ = [
     "LocalCredalCertificate",
     "RiskControlledSelector",
     "SelectiveRiskCertificate",
+    "PartialFeedbackCounts",
+    "PartialFeedbackCredalCalibrator",
+    "PartialFeedbackCredalRouter",
+    "PartialFeedbackRoutingDecision",
+    "PartialIdentificationCertificate",
 ]

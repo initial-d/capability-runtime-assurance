@@ -2,7 +2,7 @@ import time
 
 import unittest
 
-from credal_harness import AdaptiveCredalCalibrator, BudgetedAdaptiveCredalRouter, CalibrationSample, CapabilityAuthority, CapabilityToken, CredalSet, Evidence, Harness, Hypothesis, RiskControlledSelector, RollbackSandbox, ToolCall, state_digest
+from credal_harness import AdaptiveCredalCalibrator, BudgetedAdaptiveCredalRouter, CalibrationSample, CapabilityAuthority, CapabilityToken, CredalSet, Evidence, Harness, Hypothesis, PartialFeedbackCounts, PartialFeedbackCredalCalibrator, PartialFeedbackCredalRouter, RiskControlledSelector, RollbackSandbox, ToolCall, state_digest
 from experiments.run_agent_harness import execute_episode, SCENARIOS
 from experiments.run_extended_studies import score, coverage_loss_seed
 
@@ -272,6 +272,31 @@ class CredalHarnessTests(unittest.TestCase):
     self.assertLessEqual(certificate.upper_risk, 0.10)
     self.assertTrue(selector.allows(0.10))
     self.assertFalse(selector.allows(0.99))
+
+  def test_partial_feedback_interval_is_sharp_over_missing_completions(self):
+    counts = PartialFeedbackCounts(observed_harm=2, observed_safe=88, unidentified=10)
+    lower, upper = PartialFeedbackCredalCalibrator.sharp_interval(counts)
+    self.assertAlmostEqual(lower, 0.02)
+    self.assertAlmostEqual(upper, 0.12)
+
+  def test_trusted_safe_probe_contracts_credal_envelope(self):
+    calibrator = PartialFeedbackCredalCalibrator(alpha=0.05)
+    before = calibrator.certificate(
+      PartialFeedbackCounts(observed_harm=5, observed_safe=895, unidentified=100)
+    )
+    after = calibrator.certificate(before.counts.reveal(harm=0, safe=90))
+    self.assertLess(after.identified_upper, before.identified_upper)
+    self.assertLess(after.confidence_upper, before.confidence_upper)
+
+  def test_partial_feedback_router_sandboxes_unresolved_mass(self):
+    router = PartialFeedbackCredalRouter(
+      PartialFeedbackCredalCalibrator(alpha=0.05), automatic_threshold=0.05
+    )
+    decision = router.decide(
+      PartialFeedbackCounts(observed_harm=0, observed_safe=900, unidentified=100)
+    )
+    self.assertEqual(decision.action, "sandbox")
+    self.assertGreater(decision.certificate.confidence_upper, 0.05)
 
 
 if __name__ == "__main__":
