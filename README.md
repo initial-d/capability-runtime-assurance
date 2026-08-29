@@ -48,10 +48,16 @@ benchmark result is committed; other regenerable outputs remain ignored.
 - `experiments/run_partial_feedback_benchmark.py`: frozen 50-seed protocol over
   120 strata, three missingness mechanisms, six evidence budgets, and strong
   point/UCB, passive/uniform Credal, Oracle, and deny-all controls.
+- `experiments/run_safeagentbench_partial_feedback.py`: frozen 100-split
+  finite-population audit on 600 independently authored SafeAgentBench tasks;
+  upstream files are fetched from a pinned commit and digest-checked rather
+  than redistributed.
 - `experiments/results/adaptive_benchmark.json`: complete records,
   protocol hash, paired comparisons, and risk-control summaries.
 - `experiments/results/partial_feedback_benchmark.json`: complete selective-
   feedback records, protocol hash, summaries, and matched-coverage audits.
+- `experiments/results/safeagentbench_partial_feedback.json`: complete public-
+  task audit records and the frozen protocol hash.
 - `tests/`: deterministic regression tests for the enforcement boundary.
 
 ## Optional hosted evaluation
@@ -107,6 +113,18 @@ active certificate allocates familywise error over a predeclared 16-checkpoint
 cap; committed runs use no more than nine checks. For a fast installation check,
 run `python -m experiments.run_partial_feedback_benchmark --quick`; quick output
 must not replace the committed full result.
+
+## SafeAgentBench finite-population audit
+
+```bash
+make safeagentbench
+```
+
+The script downloads only the two pinned detailed-task files from the upstream
+repository, verifies their SHA-256 digests, and runs 100 frozen train/audit
+splits. Benchmark data are cached locally and are not committed here. The
+compatible upper is exact for each fixed 300-task audit pool; it is not a
+population guarantee for future tasks or embodied execution.
 
 ## License
 

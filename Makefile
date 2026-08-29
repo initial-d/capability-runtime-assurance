@@ -1,4 +1,4 @@
-.PHONY: test reproduce extensions adaptive partial-feedback sqlite sensitivity offline replay all
+.PHONY: test reproduce extensions adaptive partial-feedback safeagentbench sqlite sensitivity offline replay all
 
 PYTHON ?= python3
 
@@ -17,6 +17,9 @@ adaptive:
 partial-feedback:
 	$(PYTHON) -m experiments.run_partial_feedback_benchmark
 
+safeagentbench:
+	$(PYTHON) -m experiments.run_safeagentbench_partial_feedback
+
 sqlite:
 	$(PYTHON) -m experiments.run_sqlite_transaction_benchmark
 
@@ -29,4 +32,4 @@ offline:
 replay: offline
 	$(PYTHON) -m experiments.run_policy_benchmark --traces experiments/results/agent_harness_results.json
 
-all: test reproduce extensions adaptive partial-feedback sqlite sensitivity offline replay
+all: test reproduce extensions adaptive partial-feedback safeagentbench sqlite sensitivity offline replay
