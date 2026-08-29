@@ -108,7 +108,7 @@ make partial-feedback
 ```
 
 The run uses 50 seeds, 120 declared risk strata, MCAR/selective/severe-selective
-observation mechanisms, six trusted-probe budgets, and eleven policies. The
+observation mechanisms, six trusted-probe budgets, and twelve policies. The
 active certificate allocates familywise error over a predeclared 16-checkpoint
 cap; committed runs use no more than nine checks. For a fast installation check,
 run `python -m experiments.run_partial_feedback_benchmark --quick`; quick output
