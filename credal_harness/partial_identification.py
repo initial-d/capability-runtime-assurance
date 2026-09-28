@@ -137,9 +137,12 @@ class PartialFeedbackCredalCalibrator:
         """Observation rate required for q*r + (1-q) <= threshold."""
         risk = _clip01(observed_harm_upper)
         threshold = _clip01(risk_threshold)
+        if threshold >= 1.0:
+            return 0.0
         if risk >= 1.0:
-            return 1.0 if threshold >= 1.0 else math.inf
-        return min(1.0, max(0.0, (1.0 - threshold) / (1.0 - risk)))
+            return math.inf
+        required = max(0.0, (1.0 - threshold) / (1.0 - risk))
+        return required if required <= 1.0 else math.inf
 
 
 @dataclass(frozen=True)
@@ -189,4 +192,3 @@ class PartialFeedbackCredalRouter:
         else:
             action, reason = "deny", "credal_upper_above_confirmation_ceiling"
         return PartialFeedbackRoutingDecision(action, reason, certificate)
-

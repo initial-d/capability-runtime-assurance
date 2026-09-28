@@ -279,6 +279,13 @@ class CredalHarnessTests(unittest.TestCase):
     self.assertAlmostEqual(lower, 0.02)
     self.assertAlmostEqual(upper, 0.12)
 
+  def test_required_observed_fraction_handles_vacuous_boundary(self):
+    required = PartialFeedbackCredalCalibrator.required_observed_fraction
+    self.assertAlmostEqual(required(0.01, 0.05), 0.95 / 0.99)
+    self.assertEqual(required(0.20, 0.05), float("inf"))
+    self.assertEqual(required(1.00, 1.00), 0.0)
+    self.assertEqual(required(1.00, 0.99), float("inf"))
+
   def test_trusted_safe_probe_contracts_credal_envelope(self):
     calibrator = PartialFeedbackCredalCalibrator(alpha=0.05)
     before = calibrator.certificate(
