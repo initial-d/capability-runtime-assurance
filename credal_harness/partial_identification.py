@@ -36,6 +36,8 @@ class PartialFeedbackCounts:
     unidentified: int
 
     def __post_init__(self) -> None:
+        if not all(isinstance(value, int) for value in (self.observed_harm, self.observed_safe, self.unidentified)):
+            raise TypeError("feedback counts must be integers")
         if min(self.observed_harm, self.observed_safe, self.unidentified) < 0:
             raise ValueError("feedback counts cannot be negative")
         if self.total <= 0:

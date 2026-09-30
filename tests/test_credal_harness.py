@@ -279,6 +279,10 @@ class CredalHarnessTests(unittest.TestCase):
     self.assertAlmostEqual(lower, 0.02)
     self.assertAlmostEqual(upper, 0.12)
 
+  def test_partial_feedback_counts_require_integers(self):
+    with self.assertRaises(TypeError):
+      PartialFeedbackCounts(observed_harm=1.2, observed_safe=8, unidentified=1)
+
   def test_required_observed_fraction_handles_vacuous_boundary(self):
     required = PartialFeedbackCredalCalibrator.required_observed_fraction
     self.assertAlmostEqual(required(0.01, 0.05), 0.95 / 0.99)
