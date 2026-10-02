@@ -89,6 +89,10 @@ class CredalHarnessTests(unittest.TestCase):
     with self.assertRaises(PermissionError):
         h.validate_token(decision.token, ToolCall("read", resource="other"))
 
+  def test_harness_rejects_non_positive_token_ttl(self):
+    k = CredalSet.uniform([Hypothesis("safe", lambda c, s: 0.0)])
+    with self.assertRaises(ValueError):
+      Harness(k, token_ttl=0.0, authorization_resolver=self.AUTHORIZED)
 
   def test_rollback_sandbox_does_not_commit_by_default(self):
     authority = CapabilityAuthority()

@@ -425,6 +425,8 @@ class Harness:
         self.override_budget = float(override_budget)
         self.spent_override_budget = 0.0
         self.token_ttl = float(token_ttl)
+        if self.token_ttl <= 0.0:
+            raise ValueError("token_ttl must be positive")
         self.max_repeated_calls = int(max_repeated_calls)
         self.authority = authority or CapabilityAuthority()
         self.authorization_resolver = authorization_resolver
