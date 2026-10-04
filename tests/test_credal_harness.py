@@ -94,6 +94,17 @@ class CredalHarnessTests(unittest.TestCase):
     with self.assertRaises(ValueError):
       Harness(k, token_ttl=0.0, authorization_resolver=self.AUTHORIZED)
 
+  def test_harness_rejects_invalid_threshold_and_budget_config(self):
+    k = CredalSet.uniform([Hypothesis("safe", lambda c, s: 0.0)])
+    with self.assertRaises(ValueError):
+      Harness(k, risk_threshold=-0.1, authorization_resolver=self.AUTHORIZED)
+    with self.assertRaises(ValueError):
+      Harness(k, risk_threshold=0.2, confirmation_threshold=0.1, authorization_resolver=self.AUTHORIZED)
+    with self.assertRaises(ValueError):
+      Harness(k, cumulative_budget=-0.1, authorization_resolver=self.AUTHORIZED)
+    with self.assertRaises(ValueError):
+      Harness(k, max_repeated_calls=0, authorization_resolver=self.AUTHORIZED)
+
   def test_rollback_sandbox_does_not_commit_by_default(self):
     authority = CapabilityAuthority()
     box = RollbackSandbox({"x": 0}, authority=authority)

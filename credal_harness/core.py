@@ -420,6 +420,12 @@ class Harness:
         self.credal = credal
         self.risk_threshold = float(risk_threshold)
         self.confirmation_threshold = float(confirmation_threshold)
+        if not 0.0 <= self.risk_threshold <= 1.0:
+            raise ValueError("risk_threshold must be in [0, 1]")
+        if not 0.0 <= self.confirmation_threshold <= 1.0:
+            raise ValueError("confirmation_threshold must be in [0, 1]")
+        if self.confirmation_threshold < self.risk_threshold:
+            raise ValueError("confirmation_threshold cannot be below risk_threshold")
         self.cumulative_budget = float(cumulative_budget)
         self.spent_budget = 0.0
         self.override_budget = float(override_budget)
@@ -428,6 +434,12 @@ class Harness:
         if self.token_ttl <= 0.0:
             raise ValueError("token_ttl must be positive")
         self.max_repeated_calls = int(max_repeated_calls)
+        if self.cumulative_budget < 0.0:
+            raise ValueError("cumulative_budget cannot be negative")
+        if self.override_budget < 0.0:
+            raise ValueError("override_budget cannot be negative")
+        if self.max_repeated_calls < 1:
+            raise ValueError("max_repeated_calls must be positive")
         self.authority = authority or CapabilityAuthority()
         self.authorization_resolver = authorization_resolver
         self._uses: Dict[str, int] = {}
